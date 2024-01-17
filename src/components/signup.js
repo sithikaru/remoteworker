@@ -5,6 +5,7 @@ import {
 import { AuthErrorCodes } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { auth } from "../config/firebase";
+import SignIn from "./signin";
 
 function Signup() {
   const [email, setEmail] = useState("");
@@ -119,7 +120,9 @@ function Signup() {
   return (
 <>
       {!user && (
+        
         <div className="flex items-center justify-center h-screen bg-gray-100">
+          <SignIn/>
         <div className="bg-white border border-gray-300 shadow-md p-8 rounded w-96">
           <h2 className="text-2xl font-semibold mb-6">Sign Up</h2>
           <form>
@@ -210,7 +213,7 @@ function Signup() {
         </div>
       )}
       {user && user.emailVerified && (
-        ""
+        <SignIn/>
       )}
     </>
     

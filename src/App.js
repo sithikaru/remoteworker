@@ -1,10 +1,10 @@
+import Auth from "./components/auth";
 import Home from "./components/home";
-import Signup from "./components/signup";
 
 function App() {
   return(
     <main className="w-full">
-  <Signup/>
+  <Auth/>
   <Home/>
     </main>
   );
