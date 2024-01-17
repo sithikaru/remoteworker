@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
+import { AuthErrorCodes } from "firebase/auth";
+import React, { useEffect, useState } from "react";
+import { auth } from "../config/firebase";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(null);
+  const [error, setError] = useState(null);
+    const [user, setUser] = useState(null)
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -15,13 +23,102 @@ function Signup() {
     setPasswordsMatch(password === e.target.value);
   };
 
-  const signUpAction = async () => {
-    console.log(email, password);
+  const validateEmail = (input) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(input);
   };
 
+  const validatePassword = (input) => {
+    // Add your password validation logic here (e.g., minimum length)
+    return input.length >= 6;
+  };
+
+  const signUpAction = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
+
+    // Basic input validation
+    if (!validateEmail(email)) {
+      setError("Invalid email address. Please enter a valid email.");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError("Password is too short. Please choose a longer password.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match. Please confirm your password.");
+      return;
+    }
+
+    try {
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCred.user;
+      await sendEmailVerification(user);
+      console.log("Verification email sent successfully.");
+      setError("");
+    } catch (error) {
+      handleFirebaseError(error);
+    }
+  };
+
+  const handleFirebaseError = (error) => {
+    switch (error.code) {
+      case AuthErrorCodes.EMAIL_EXISTS:
+        setError(
+          "Email address is already in use. Try signing in or use a different email."
+        );
+        break;
+      case AuthErrorCodes.INVALID_EMAIL:
+        setError(
+          "Invalid email address. Please check your email and try again."
+        );
+        break;
+      case AuthErrorCodes.WEAK_PASSWORD:
+        setError("The password is too weak. Choose a stronger password.");
+        break;
+      case AuthErrorCodes.USER_DISABLED:
+        setError(
+          "This account has been disabled. Contact support for assistance."
+        );
+        break;
+      case AuthErrorCodes.TOO_MANY_ATTEMPTS_TRY_LATER:
+        setError("Too many unsuccessful login attempts. Try again later.");
+        break;
+      case AuthErrorCodes.OPERATION_NOT_ALLOWED:
+        setError(
+          "Password sign-in is disabled for this project. Contact support."
+        );
+        break;
+      default:
+        setError("An error occurred. Please try again later.");
+        console.error(error);
+    }
+  };
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((userCred) => {
+      if (userCred) {
+        const { email, emailVerified } = userCred;
+        setUser({ email, emailVerified });
+        // console.log(email, emailVerified);
+      } else {
+        setUser(null); // Set user to null when not authenticated
+      }
+    });
+  
+    return () => {
+      // Unsubscribe from the listener when the component unmounts
+      unsubscribe();
+    };
+  }, []);
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white border border-gray-300 shadow-md p-8 rounded w-96">
+      {!user && <div className="bg-white border border-gray-300 shadow-md p-8 rounded w-96">
         <h2 className="text-2xl font-semibold mb-6">Sign Up</h2>
         <form>
           <div className="mb-4">
@@ -74,26 +171,44 @@ function Signup() {
               placeholder="Confirm Your password"
               required
             />
-            {passwordsMatch === false && (
-              <p className="text-red-500 text-xs">Passwords do not match!</p>
-            )}
-            {passwordsMatch === true && (
-              <p className="text-green-500 text-xs">Correct!</p>
-            )}
+
+            <button
+              className={`bg-teal-500 text-white p-2 rounded hover:bg-teal-600 mt-5`}
+              onClick={(e) => signUpAction(e)}
+            >
+              Sign Up
+            </button>
           </div>
-          <button
-            className={`bg-teal-500 text-white p-2 rounded hover:bg-teal-600 focus:outline-none focus:ring focus:border-blue-300`}
-            onClick={signUpAction}
-            disabled={passwordsMatch === false}
-            style={{
-              backgroundColor: passwordsMatch === false ? "gray" : "",
-              cursor: passwordsMatch === false ? "not-allowed" : "pointer",
-            }}
-          >
-            Sign Up
-          </button>
+          {error && (
+            <div
+              className="bg-red-100 border text-center border-red-400 text-red-700 px-4 py-3 rounded relative mt-2"
+              role="alert"
+            >
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
         </form>
+      </div>}
+      {user && !user.emailVerified &&<div>
+        <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className=" border border-gray-300 shadow-md p-8 rounded text-center bg-lime-200">
+        <h1 className="p-10 text-xl mb-6">Sent you a link to your email,<br/>verify your account to continue...</h1>
       </div>
+    </div>
+        </div>}
+      {user && user.emailVerified && <div>
+        <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="bg-white border border-gray-300 shadow-md p-8 rounded text-center">
+        <h2 className="text-2xl font-semibold mb-6">Account Created Successfully</h2>
+        <p className="text-green-500 text-lg mb-6">You can now continue with your journey!</p>
+        <button
+          className="bg-teal-500 text-white p-3 rounded hover:bg-teal-600 focus:outline-none focus:ring focus:border-blue-300"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+        </div>}
     </div>
   );
 }
