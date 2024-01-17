@@ -12,7 +12,7 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(null);
   const [error, setError] = useState(null);
-    const [user, setUser] = useState(null)
+  const [user, setUser] = useState(null);
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -110,106 +110,110 @@ function Signup() {
         setUser(null); // Set user to null when not authenticated
       }
     });
-  
+
     return () => {
       // Unsubscribe from the listener when the component unmounts
       unsubscribe();
     };
   }, []);
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      {!user && <div className="bg-white border border-gray-300 shadow-md p-8 rounded w-96">
-        <h2 className="text-2xl font-semibold mb-6">Sign Up</h2>
-        <form>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-600 text-sm mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
-              placeholder="Your email"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-gray-600 text-sm mb-2"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={password}
-              onChange={handlePasswordChange}
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
-              placeholder="Your password"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-gray-600 text-sm mb-2"
-            >
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="Cpassword"
-              name="Cpassword"
-              value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
-              placeholder="Confirm Your password"
-              required
-            />
-
-            <button
-              className={`bg-teal-500 text-white p-2 rounded hover:bg-teal-600 mt-5`}
-              onClick={(e) => signUpAction(e)}
-            >
-              Sign Up
-            </button>
-          </div>
-          {error && (
-            <div
-              className="bg-red-100 border text-center border-red-400 text-red-700 px-4 py-3 rounded relative mt-2"
-              role="alert"
-            >
-              <span className="block sm:inline">{error}</span>
+<>
+      {!user && (
+        <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="bg-white border border-gray-300 shadow-md p-8 rounded w-96">
+          <h2 className="text-2xl font-semibold mb-6">Sign Up</h2>
+          <form>
+            <div className="mb-4">
+              <label
+                htmlFor="email"
+                className="block text-gray-600 text-sm mb-2"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
+                placeholder="Your email"
+                required
+              />
             </div>
-          )}
-        </form>
-      </div>}
-      {user && !user.emailVerified &&<div>
+            <div className="mb-4">
+              <label
+                htmlFor="password"
+                className="block text-gray-600 text-sm mb-2"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={password}
+                onChange={handlePasswordChange}
+                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
+                placeholder="Your password"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="password"
+                className="block text-gray-600 text-sm mb-2"
+              >
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="Cpassword"
+                name="Cpassword"
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
+                placeholder="Confirm Your password"
+                required
+              />
+
+              <button
+                className={`bg-teal-500 text-white p-2 rounded hover:bg-teal-600 mt-5`}
+                onClick={(e) => signUpAction(e)}
+              >
+                Sign Up
+              </button>
+            </div>
+            {error && (
+              <div
+                className="bg-red-100 border text-center border-red-400 text-red-700 px-4 py-3 rounded relative mt-2"
+                role="alert"
+              >
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+          </form>
+        </div>
+        </div>
+      )}
+      {user && !user.emailVerified && (
         <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className=" border border-gray-300 shadow-md p-8 rounded text-center bg-lime-200">
-        <h1 className="p-10 text-xl mb-6">Sent you a link to your email,<br/>verify your account to continue...</h1>
-      </div>
-    </div>
-        </div>}
-      {user && user.emailVerified && <div>
-        <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white border border-gray-300 shadow-md p-8 rounded text-center">
-        <h2 className="text-2xl font-semibold mb-6">Account Created Successfully</h2>
-        <p className="text-green-500 text-lg mb-6">You can now continue with your journey!</p>
-        <button
-          className="bg-teal-500 text-white p-3 rounded hover:bg-teal-600 focus:outline-none focus:ring focus:border-blue-300"
-        >
-          Continue
-        </button>
-      </div>
-    </div>
-        </div>}
-    </div>
+          <div className="flex items-center justify-center h-screen bg-gray-100">
+            <div className=" border border-gray-300 shadow-md p-8 rounded text-center bg-lime-200">
+              <h1 className="p-10 text-xl mb-6">
+                Sent you a link to your email,
+                <br />
+                verify your account to continue...
+              </h1>
+            </div>
+          </div>
+        </div>
+      )}
+      {user && user.emailVerified && (
+        ""
+      )}
+    </>
+    
   );
 }
 
