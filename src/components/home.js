@@ -1,8 +1,11 @@
 import React from 'react'
+import LocationComponent from './location'
 
 function Home() {
   return (
-    <div>Home</div>
+    <div>
+      <LocationComponent/>
+    </div>
   )
 }
 
